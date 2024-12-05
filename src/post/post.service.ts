@@ -1,9 +1,26 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class PostService {
   constructor(private prisma: PrismaService) {}
+
+  async uploadImage(file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException("파일을 찾을 수 없습니다");
+    }
+
+    const imageUrl = `${
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_URL
+        : `http://127.0.0.1:${process.env.NEST_PORT}`
+    }/uploads/${file.filename}`;
+    return imageUrl; // 클라이언트에서 사용할 수 있도록 URL 반환
+  }
 
   async createPost(
     title: string,
@@ -160,11 +177,7 @@ export class PostService {
       include: {
         postTags: {
           select: {
-            tag: {
-              select: {
-                id: true,
-              },
-            },
+            tag: true,
           },
         },
         images: {
@@ -185,7 +198,7 @@ export class PostService {
       id,
       title,
       date: createdAt,
-      tags: postTags ? postTags.map((tag) => tag.tag.id) : [],
+      tags: postTags ? postTags.map((tag) => tag.tag) : [],
       images: images ? images.map((image) => image.src) : [],
     };
 
@@ -245,10 +258,10 @@ export class PostService {
       select: {
         id: true,
         title: true,
-        createdAt: true,
+        content: true,
         postTags: {
           select: {
-            tagId: true,
+            tag: true,
           },
         },
       },
@@ -263,6 +276,16 @@ export class PostService {
       throw new NotFoundException("No posts found");
     }
 
-    return { totalCount, posts };
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      tags: post.postTags.map((postTag) => ({
+        id: postTag.tag.id,
+        name: postTag.tag.name,
+      })),
+    }));
+
+    return { totalCount, posts: formattedPosts };
   }
 }

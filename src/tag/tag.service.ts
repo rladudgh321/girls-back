@@ -1,13 +1,34 @@
 // tags.service.ts
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service"; // PrismaService를 사용
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class TagService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async createTag(name: string) {
+  private async tokenCheck(token: string) {
+    const decoded = this.jwtService.verify(token.slice(7), {
+      secret: this.configService.get("jwt").secret,
+    });
+    const user = await this.prisma.user.findUnique({
+      where: { id: decoded.sub },
+    });
+
+    if (!user) {
+      throw new NotFoundException("작성자를 찾을 수 없습니다.");
+    }
+  }
+
+  async createTag(token: string, name: string) {
     // Prisma를 사용하여 태그 추가
+    this.tokenCheck(token);
+
     const tag = await this.prisma.tag.create({
       data: {
         name,
@@ -30,8 +51,9 @@ export class TagService {
   }
 
   // 태그 수정
-  async updateTag(id: number, name: string) {
+  async updateTag(id: number, name: string, token: string) {
     // Prisma를 사용하여 태그 수정
+    this.tokenCheck(token);
     const updatedTag = await this.prisma.tag.update({
       where: { id }, // ID로 찾기
       data: { name }, // 이름만 업데이트
@@ -46,18 +68,23 @@ export class TagService {
   }
 
   // 태그 삭제
-  async deleteTag(id: number) {
+  async deleteTag({ id, token }: { id: number; token: string }) {
+    this.tokenCheck(token);
     // Prisma를 사용하여 태그 삭제
-    const tag = await this.prisma.tag.delete({
-      where: {
-        id, // id로 태그를 찾고 삭제
-      },
+    const tag = await this.prisma.tag.findUnique({
+      where: { id },
     });
 
+    // 태그가 존재하지 않으면 NotFoundException 던지기
     if (!tag) {
-      throw new NotFoundException(`Tag with id ${id} not found`); // 태그가 없으면 404 에러
+      throw new NotFoundException(`Tag with id ${id} not found`);
     }
 
-    return tag; // 삭제된 태그 반환
+    // 태그 삭제
+    await this.prisma.tag.delete({
+      where: { id },
+    });
+
+    return { message: "Tag deleted successfully" };
   }
 }

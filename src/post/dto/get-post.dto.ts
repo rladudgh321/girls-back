@@ -36,11 +36,11 @@ export class GetPostResDto {
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",
-    example: [1, 2, 3],
+    example: ["nestjs", "nextjs"],
   })
   @IsArray()
   @IsOptional()
-  tags: number[]; // 게시글에 연결된 태그 ID 배열
+  tags: { id: number; name: string }[]; // 게시글에 연결된 태그 ID 배열
 
   @ApiPropertyOptional({
     description: "List of image URLs associated with the post",
