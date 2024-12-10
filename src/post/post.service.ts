@@ -4,66 +4,97 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import * as path from "path";
 
 @Injectable()
 export class PostService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async uploadImage(file: Express.Multer.File) {
-    if (!file) {
+  private async tokenCheck(token: string) {
+    const decoded = this.jwtService.verify(token.slice(7), {
+      secret: this.configService.get("jwt").secret,
+    });
+    const user = await this.prisma.user.findUnique({
+      where: { id: decoded.sub },
+    });
+
+    if (!user) {
+      throw new NotFoundException("작성자를 찾을 수 없습니다.");
+    }
+  }
+
+  async uploadImages(files: Express.Multer.File[]) {
+    if (!files || files.length === 0) {
       throw new BadRequestException("파일을 찾을 수 없습니다");
     }
 
-    const imageUrl = `${
-      process.env.NODE_ENV === "production"
-        ? process.env.CLIENT_URL
-        : `http://127.0.0.1:${process.env.NEST_PORT}`
-    }/uploads/${file.filename}`;
-    return imageUrl; // 클라이언트에서 사용할 수 있도록 URL 반환
+    // 여러 파일의 URL을 저장할 배열 생성
+    const imageUrls = files.map((file) => {
+      const fileName = path.basename(file.path);
+      console.log("fileName", fileName);
+      return fileName;
+    });
+
+    return imageUrls; // 여러 파일의 URL을 배열로 반환
   }
 
   async createPost(
     title: string,
     content: string,
-    tags: number[],
-    images: string[],
+    tags: string[],
+    images: { src: string }[],
+    token: string,
   ) {
+    // Token 확인 함수 (예시)
+    this.tokenCheck(token);
+
     // 태그가 전달되었을 경우, 태그가 존재하는지 확인하고 연결
-    const tagData = tags
-      ? await Promise.all(
-          tags.map(async (tagId) => {
-            const tag = await this.prisma.tag.findUnique({
-              where: { id: tagId },
-            });
+    const tagData =
+      tags.length > 0
+        ? await Promise.all(
+            tags.map(async (tagname) => {
+              const tag = await this.prisma.tag.findUnique({
+                where: { name: tagname },
+              });
 
-            if (!tag) {
-              throw new NotFoundException(`Tag with ID ${tagId} not found`);
-            }
+              if (!tag) {
+                throw new NotFoundException(`Tag with ID ${tagname} not found`);
+              }
 
-            return { id: tagId }; // 존재하는 태그만 연결
-          }),
-        )
-      : [];
+              return { name: tagname }; // 존재하는 태그만 연결
+            }),
+          )
+        : [];
+    console.log("tagDatatagData", tagData);
+    // 이미지가 전달되었을 경우 처리
+    const imageData =
+      images.length > 0 ? images.map((image) => ({ src: image.src })) : [];
 
     // 게시글 생성
     const newPost = await this.prisma.post.create({
       data: {
         title,
         content,
-        images: {
-          create: images?.map((src) => ({ src })), // 이미지 생성
-        },
-        postTags: {
-          create: tagData.map((tag) => ({
-            tag: {
-              connect: { id: tag.id }, // 존재하는 태그 연결
-            },
-          })),
-        },
+        images: imageData.length > 0 ? { create: imageData } : undefined, // 이미지가 있을 경우에만 생성
+        postTags:
+          tagData.length > 0
+            ? {
+                create: tagData.map((tag) => ({
+                  tag: {
+                    connect: { name: tag.name }, // 존재하는 태그 연결
+                  },
+                })),
+              }
+            : undefined, // 태그가 있을 경우에만 생성
       },
       include: {
         postTags: {
-          // postTags를 포함하여 반환
           select: {
             tag: {
               select: {
@@ -73,7 +104,6 @@ export class PostService {
           },
         },
         images: {
-          // 이미지 정보도 포함하여 반환
           select: {
             src: true, // 이미지 src만 선택
           },
@@ -84,7 +114,8 @@ export class PostService {
     return newPost;
   }
 
-  async deletePost(id: number) {
+  async deletePost(id: number, token: string) {
+    this.tokenCheck(token);
     // 해당 게시글이 존재하는지 확인
     const existingPost = await this.prisma.post.findUnique({
       where: { id },
@@ -192,12 +223,12 @@ export class PostService {
       throw new NotFoundException("Post not found");
     }
 
-    const { id, title, createdAt, postTags, images } = post;
+    const { id, title, content, postTags, images } = post;
 
     const responseData = {
       id,
       title,
-      date: createdAt,
+      content,
       tags: postTags ? postTags.map((tag) => tag.tag) : [],
       images: images ? images.map((image) => image.src) : [],
     };

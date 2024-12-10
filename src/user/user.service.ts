@@ -13,6 +13,19 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
+  private async tokenCheck(token: string) {
+    const decoded = this.jwtService.verify(token.slice(7), {
+      secret: this.configService.get("jwt").secret,
+    });
+    const user = await this.prismaService.user.findUnique({
+      where: { id: decoded.sub },
+    });
+
+    if (!user) {
+      throw new NotFoundException("작성자를 찾을 수 없습니다.");
+    }
+  }
+
   async findAll(page: number, postsPerPage: number) {
     const user = await this.prismaService.user.findMany({
       skip: (page - 1) * postsPerPage,

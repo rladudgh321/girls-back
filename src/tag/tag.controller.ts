@@ -7,7 +7,7 @@ import {
   Patch,
   Param,
   Delete,
-  Headers
+  Headers,
 } from "@nestjs/common";
 import { TagService } from "./tag.service";
 import { CreateTagReqDto, CreateTagResDto } from "./dto/create-tag.dto";

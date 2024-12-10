@@ -27,11 +27,11 @@ export class CreatePostReqDto {
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",
-    example: [1, 2, 3],
+    example: ["nestjs", "nextjs"],
   })
   @IsOptional()
   @IsArray()
-  tags?: number[]; // 태그 ID 목록
+  tags?: string[]; // 태그 ID 목록
 
   @ApiPropertyOptional({
     description: "List of image URLs associated with the post",
@@ -42,7 +42,7 @@ export class CreatePostReqDto {
   })
   @IsOptional()
   @IsArray()
-  images?: string[]; // 이미지 URL 목록
+  images?: { src: string }[]; // 이미지 URL 목록
 }
 
 export class CreatePostResponseDto {

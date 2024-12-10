@@ -11,6 +11,8 @@ import {
   ParseFilePipeBuilder,
   HttpStatus,
   UseInterceptors,
+  Headers,
+  UploadedFiles,
 } from "@nestjs/common";
 import { PostService } from "./post.service";
 import { CreatePostReqDto, CreatePostResponseDto } from "./dto/create-post.dto";
@@ -31,7 +33,7 @@ import {
   ApiPostResponse,
 } from "src/common/decorator/swagger.decorator";
 import { Public } from "src/common/decorator/public.decorator";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 
 @ApiTags("post")
 @ApiExtraModels(
@@ -48,35 +50,39 @@ export class PostController {
   @Public()
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FileInterceptor("file"))
+  @UseInterceptors(FilesInterceptor("files")) // FileInterceptor -> FilesInterceptor로 변경
   @ApiBody({
     schema: {
       type: "object",
       properties: {
-        file: {
-          type: "string",
-          format: "binary",
+        files: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "binary",
+          },
         },
       },
     },
   })
   @Post("upload")
-  uploadFile(
-    @UploadedFile(
+  async uploadFiles(
+    @UploadedFiles(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
           fileType: /(jpg|jpeg|png|webp)$/,
         })
         .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024,
+          maxSize: 5 * 1024 * 1024, // 최대 파일 크기 5MB
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         }),
     )
-    file: Express.Multer.File,
+    files: Express.Multer.File[], // 여러 파일을 처리하기 위해 배열로 수정
   ) {
-    return this.postService.uploadImage(file);
+    console.log("files", files);
+    return this.postService.uploadImages(files); // 여러 파일을 처리하는 로직으로 수정
   }
 
   @Public()
@@ -95,19 +101,22 @@ export class PostController {
   @Post()
   async createPost(
     @Body() { title, content, tags, images }: CreatePostReqDto,
-  ): Promise<CreatePostResponseDto> {
+    @Headers("authorization") token: string,
+  ): Promise<any> {
+    // ): Promise<CreatePostResponseDto> {
     const newPost = await this.postService.createPost(
       title,
       content,
       tags,
       images,
+      token,
     );
     return {
       id: newPost.id,
       title: newPost.title,
       content: newPost.content,
-      tags: newPost.postTags["tag"],
-      images: newPost.images["images"],
+      // tags: newPost.postTags[""],
+      // images: newPost.images["images"],
     };
   }
 
@@ -120,7 +129,6 @@ export class PostController {
   ): Promise<any> {
     // 게시글 데이터를 가져오는 서비스 호출
     const result = await this.postService.getPosts(page, postsPerPage, tag);
-    console.log("resuulst", result.posts);
     // 응답 형식에 맞게 반환
     return {
       totalCount: result.totalCount,
@@ -143,7 +151,7 @@ export class PostController {
     return {
       id: postData.id,
       title: postData.title,
-      date: postData.date,
+      content: postData.content,
       tags: postData.tags,
       images: postData.images,
     };
@@ -179,8 +187,11 @@ export class PostController {
     description: "The ID of the post to delete",
     example: 1,
   })
-  async deletePost(@Param("id") id: number) {
-    const result = await this.postService.deletePost(id);
+  async deletePost(
+    @Param("id") id: number,
+    @Headers("authorization") token: string,
+  ) {
+    const result = await this.postService.deletePost(id, token);
     return result; // 삭제 성공 메시지 반환
   }
 }

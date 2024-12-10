@@ -28,11 +28,11 @@ export class GetPostResDto {
   title: string; // 게시글 제목
 
   @ApiProperty({
-    description: "The date the post was created",
-    example: "2024-12-04T10:00:00.000Z", // ISO 8601 형식 예시
+    description: "The content the post was created",
+    example: "hello everyone", // ISO 8601 형식 예시
   })
   @IsString()
-  date: Date; // 게시글 작성일
+  content: string; // 게시글 작성일
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",

@@ -7331,12 +7331,12 @@ export namespace Prisma {
 
   export type TagWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    name?: string
     AND?: TagWhereInput | TagWhereInput[]
     OR?: TagWhereInput[]
     NOT?: TagWhereInput | TagWhereInput[]
-    name?: StringFilter<"Tag"> | string
     postTags?: PostTagListRelationFilter
-  }, "id">
+  }, "id" | "name">
 
   export type TagOrderByWithAggregationInput = {
     id?: SortOrder
