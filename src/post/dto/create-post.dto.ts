@@ -36,13 +36,19 @@ export class CreatePostReqDto {
   @ApiPropertyOptional({
     description: "List of image URLs associated with the post",
     example: [
-      "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
-      "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+      {
+        src: "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
+        postId: 10,
+      },
+      {
+        src: "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+        postId: 10,
+      },
     ],
   })
   @IsOptional()
   @IsArray()
-  images?: { src: string }[]; // 이미지 URL 목록
+  images?: { src: string; postId: number }[]; // 이미지 URL 목록
 }
 
 export class CreatePostResponseDto {
@@ -78,11 +84,17 @@ export class CreatePostResponseDto {
   @ApiPropertyOptional({
     description: "List of image URLs associated with the post",
     example: [
-      "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
-      "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+      {
+        src: "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
+        postId: 10,
+      },
+      {
+        src: "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+        postId: 10,
+      },
     ],
   })
   @IsArray()
   @IsOptional()
-  images: string[]; // 연결된 이미지 src 배열 (선택적)
+  images?: { src: string; postId: number }[]; // 이미지 URL 목록
 }

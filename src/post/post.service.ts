@@ -71,17 +71,15 @@ export class PostService {
             }),
           )
         : [];
-    console.log("tagDatatagData", tagData);
     // 이미지가 전달되었을 경우 처리
     const imageData =
       images.length > 0 ? images.map((image) => ({ src: image.src })) : [];
-
     // 게시글 생성
     const newPost = await this.prisma.post.create({
       data: {
         title,
         content,
-        images: imageData.length > 0 ? { create: imageData } : undefined, // 이미지가 있을 경우에만 생성
+        images: imageData.length > 0 ? { create: imageData } : { create: [] }, // 이미지가 있을 경우에만 생성
         postTags:
           tagData.length > 0
             ? {
