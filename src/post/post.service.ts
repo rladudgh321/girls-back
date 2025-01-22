@@ -37,9 +37,10 @@ export class PostService {
     // 여러 파일의 URL을 저장할 배열 생성
     const imageUrls = files.map((file) => {
       const fileName = path.basename(file.path);
-      console.log("fileName", fileName);
       return fileName;
     });
+
+    console.log("imageUrls", imageUrls);
 
     return imageUrls; // 여러 파일의 URL을 배열로 반환
   }

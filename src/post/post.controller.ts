@@ -81,7 +81,6 @@ export class PostController {
     )
     files: Express.Multer.File[], // 여러 파일을 처리하기 위해 배열로 수정
   ) {
-    console.log("files", files);
     return this.postService.uploadImages(files); // 여러 파일을 처리하는 로직으로 수정
   }
 

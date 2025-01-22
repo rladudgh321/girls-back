@@ -35,7 +35,8 @@ export class MulterConfigService implements MulterOptionsFactory {
           // 파일명 설정
           const ext = path.extname(file.originalname);
           const name = path.basename(file.originalname, ext);
-          done(null, `${name}_${Date.now()}${ext}`); //파일이름_날짜.확장자
+          const buffer = Buffer.from(name, "binary").toString("utf-8");
+          done(null, `${buffer}_${Date.now()}${ext}`); //파일이름_날짜.확장자
         },
       }),
       limits: { fileSize: 10 * 1024 * 1024 }, // 용량 제한
