@@ -64,7 +64,41 @@ export class CreatePostReqDto {
   })
   @IsOptional()
   @IsArray()
-  images?: { src: string; postId: number }[]; // 이미지 URL 목록
+  images1?: { src: string; postId: number }[]; // 이미지 URL 목록
+
+  @ApiPropertyOptional({
+    description: "List of image URLs associated with the post",
+    example: [
+      {
+        src: "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
+        postId: 10,
+      },
+      {
+        src: "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+        postId: 10,
+      },
+    ],
+  })
+  @IsOptional()
+  @IsArray()
+  images2?: { src: string; postId: number }[]; // 이미지 URL 목록
+
+  @ApiPropertyOptional({
+    description: "List of image URLs associated with the post",
+    example: [
+      {
+        src: "https://cdn.pixabay.com/photo/2023/02/22/19/13/reading-7807231_640.jpg",
+        postId: 10,
+      },
+      {
+        src: "https://cdn.pixabay.com/photo/2024/11/21/19/04/elephant-9214527_640.jpg",
+        postId: 10,
+      },
+    ],
+  })
+  @IsOptional()
+  @IsArray()
+  images3: { src: string; postId: number }[]; // 이미지 URL 목록
 }
 
 export class CreatePostResponseDto {

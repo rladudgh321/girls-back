@@ -63,7 +63,7 @@ export class TagController {
   @ApiPostResponse(UpdateTagResDto)
   @Patch(":id")
   async updateTag(
-    @Param("id") id: number,
+    @Param("id") id: string,
     @Body() { name }: UpdateTagReqDto,
     @Headers("authorization") token: string,
   ): Promise<UpdateTagResDto> {
@@ -75,7 +75,7 @@ export class TagController {
   @ApiParam({
     name: "id",
     description: "The ID of the tag to delete",
-    example: 1,
+    example: "fd3d1e80-6e11-4777-91b5-735dd2f45f83",
   }) // Swagger에서 파라미터 id에 대한 설명 추가
   @ApiResponse({
     status: 200,
@@ -87,7 +87,7 @@ export class TagController {
   })
   @Delete(":id")
   async deleteTag(
-    @Param("id") id: number,
+    @Param("id") id: string,
     @Headers("authorization") token: string,
   ): Promise<void> {
     await this.tagService.deleteTag({ id, token }); // 서비스에서 태그 삭제 호출

@@ -7,10 +7,10 @@ export class GetTagsResDto {
     description: "List of tags",
     type: [Object],
     example: [
-      { id: 1, name: "nestjs" },
-      { id: 2, name: "prisma" },
+      { id: "b35d742f-6507-4a4d-84ea-d4209921d013", name: "nestjs" },
+      { id: "b35d742f-6507-4a4d-84ea-d4209921d015", name: "prisma" },
     ],
   })
   @IsArray()
-  tags: { id: number; name: string }[]; // 태그 객체 목록 (ID와 이름 포함)
+  tags: { id: string; name: string }[]; // 태그 객체 목록 (ID와 이름 포함)
 }

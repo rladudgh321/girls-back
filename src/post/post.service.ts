@@ -29,18 +29,42 @@ export class PostService {
     }
   }
 
-  async uploadImages(files: Express.Multer.File[]) {
-    if (!files || files.length === 0) {
-      throw new BadRequestException("파일을 찾을 수 없습니다");
+  async uploadImages(files: {
+    image1?: Express.Multer.File[];
+    image2?: Express.Multer.File[];
+    image3?: Express.Multer.File[];
+  }) {
+    // 각 필드에 대해 파일이 있는지 확인하고 처리
+    const imageUrls: string[] = [];
+
+    // image1 필드에 있는 파일들을 처리
+    if (files.image1 && files.image1.length > 0) {
+      files.image1.forEach((file) => {
+        const fileName = path.basename(file.path); // 경로에서 파일 이름 추출
+        imageUrls.push(fileName);
+      });
     }
 
-    // 여러 파일의 URL을 저장할 배열 생성
-    const imageUrls = files.map((file) => {
-      const fileName = path.basename(file.path);
-      return fileName;
-    });
+    // image2 필드에 있는 파일들을 처리
+    if (files.image2 && files.image2.length > 0) {
+      files.image2.forEach((file) => {
+        const fileName = path.basename(file.path);
+        imageUrls.push(fileName);
+      });
+    }
 
-    console.log("imageUrls", imageUrls);
+    // image3 필드에 있는 파일들을 처리
+    if (files.image3 && files.image3.length > 0) {
+      files.image3.forEach((file) => {
+        const fileName = path.basename(file.path);
+        imageUrls.push(fileName);
+      });
+    }
+
+    // 파일이 하나도 없는 경우 예외 처리
+    if (imageUrls.length === 0) {
+      throw new BadRequestException("파일을 찾을 수 없습니다.");
+    }
 
     return imageUrls; // 여러 파일의 URL을 배열로 반환
   }
@@ -48,7 +72,9 @@ export class PostService {
   async createPost(
     title: string,
     tags: string[],
-    images: { src: string }[],
+    images1: { src: string }[], // images1 필드
+    images2: { src: string }[], // images2 필드
+    images3: { src: string }[], // images3 필드
     token: string,
     content3: string,
     content1?: string,
@@ -74,9 +100,7 @@ export class PostService {
             }),
           )
         : [];
-    // 이미지가 전달되었을 경우 처리
-    const imageData =
-      images.length > 0 ? images.map((image) => ({ src: image.src })) : [];
+
     // 게시글 생성
     const newPost = await this.prisma.post.create({
       data: {
@@ -84,7 +108,18 @@ export class PostService {
         content1,
         content2,
         content3,
-        images: imageData.length > 0 ? { create: imageData } : { create: [] }, // 이미지가 있을 경우에만 생성
+        images1:
+          images1.length > 0
+            ? { create: images1.map((image) => ({ src: image.src })) }
+            : { create: [] }, // 이미지가 있을 경우에만 생성
+        images2:
+          images2.length > 0
+            ? { create: images2.map((image) => ({ src: image.src })) }
+            : { create: [] }, // 이미지가 있을 경우에만 생성
+        images3:
+          images3.length > 0
+            ? { create: images3.map((image) => ({ src: image.src })) }
+            : { create: [] }, // 이미지가 있을 경우에만 생성
         postTags:
           tagData.length > 0
             ? {
@@ -106,7 +141,17 @@ export class PostService {
             },
           },
         },
-        images: {
+        images1: {
+          select: {
+            src: true, // 이미지 src만 선택
+          },
+        },
+        images2: {
+          select: {
+            src: true, // 이미지 src만 선택
+          },
+        },
+        images3: {
           select: {
             src: true, // 이미지 src만 선택
           },
@@ -117,7 +162,7 @@ export class PostService {
     return newPost;
   }
 
-  async deletePost(id: number, token: string) {
+  async deletePost(id: string, token: string) {
     this.tokenCheck(token);
     // 해당 게시글이 존재하는지 확인
     const existingPost = await this.prisma.post.findUnique({
@@ -137,13 +182,15 @@ export class PostService {
   }
 
   async updatePost(
-    id: number,
+    id: string,
     title: string,
     content1: string,
     content2: string,
     content3: string,
-    tags: number[],
-    images: string[],
+    tags: string[],
+    images1: string[],
+    images2: string[],
+    images3: string[],
   ) {
     // 해당 게시글이 존재하는지 확인
     const existingPost = await this.prisma.post.findUnique({
@@ -162,10 +209,22 @@ export class PostService {
         content1: content1 ?? existingPost.content1, // 내용이 없으면 기존 내용 사용
         content2: content2 ?? existingPost.content2, // 내용이 없으면 기존 내용 사용
         content3: content3 ?? existingPost.content3, // 내용이 없으면 기존 내용 사용
-        images: images
+        images1: images1
           ? {
               deleteMany: {}, // 기존 이미지 삭제
-              create: images.map((src) => ({ src })), // 새 이미지 추가
+              create: images1.map((src) => ({ src })), // 새 이미지 추가
+            }
+          : undefined,
+        images2: images2
+          ? {
+              deleteMany: {}, // 기존 이미지 삭제
+              create: images2.map((src) => ({ src })), // 새 이미지 추가
+            }
+          : undefined,
+        images3: images3
+          ? {
+              deleteMany: {}, // 기존 이미지 삭제
+              create: images3.map((src) => ({ src })), // 새 이미지 추가
             }
           : undefined,
         postTags: tags
@@ -190,7 +249,19 @@ export class PostService {
             },
           },
         },
-        images: {
+        images1: {
+          // 이미지 정보도 포함하여 반환
+          select: {
+            src: true, // 이미지 src만 선택
+          },
+        },
+        images2: {
+          // 이미지 정보도 포함하여 반환
+          select: {
+            src: true, // 이미지 src만 선택
+          },
+        },
+        images3: {
           // 이미지 정보도 포함하여 반환
           select: {
             src: true, // 이미지 src만 선택
@@ -207,20 +278,32 @@ export class PostService {
       content2: updatedPost.content2,
       content3: updatedPost.content3,
       tags: updatedPost.postTags.map((postTag) => postTag.tag.id), // postTags에서 tag.id를 가져옴
-      images: updatedPost.images.map((image) => image.src), // images에서 src를 가져옴
+      images1: updatedPost.images1.map((image) => image.src), // images에서 src를 가져옴
+      images2: updatedPost.images2.map((image) => image.src), // images에서 src를 가져옴
+      images3: updatedPost.images3.map((image) => image.src), // images에서 src를 가져옴
     };
   }
 
   async getPostById(postId: string) {
     const post = await this.prisma.post.findUnique({
-      where: { id: Number(postId) },
+      where: { id: postId },
       include: {
         postTags: {
           select: {
             tag: true,
           },
         },
-        images: {
+        images1: {
+          select: {
+            src: true,
+          },
+        },
+        images2: {
+          select: {
+            src: true,
+          },
+        },
+        images3: {
           select: {
             src: true,
           },
@@ -232,7 +315,17 @@ export class PostService {
       throw new NotFoundException("Post not found");
     }
 
-    const { id, title, content1, content2, content3, postTags, images } = post;
+    const {
+      id,
+      title,
+      content1,
+      content2,
+      content3,
+      postTags,
+      images1,
+      images2,
+      images3,
+    } = post;
 
     const responseData = {
       id,
@@ -241,8 +334,12 @@ export class PostService {
       content2,
       content3,
       tags: postTags ? postTags.map((tag) => tag.tag) : [],
-      images: images ? images.map((image) => image.src) : [],
+      images1: images1 ? images1.map((image) => image.src) : [],
+      images2: images2 ? images2.map((image) => image.src) : [],
+      images3: images3 ? images3.map((image) => image.src) : [],
     };
+
+    console.log("ddd", responseData);
 
     return responseData;
   }

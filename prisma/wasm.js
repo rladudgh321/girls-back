@@ -130,6 +130,16 @@ exports.Prisma.RefreshTokenScalarFieldEnum = {
   refreshTokenId: 'refreshTokenId'
 };
 
+exports.Prisma.TagScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.PostTagScalarFieldEnum = {
+  postId: 'postId',
+  tagId: 'tagId'
+};
+
 exports.Prisma.PostScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -139,20 +149,22 @@ exports.Prisma.PostScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.TagScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
-};
-
-exports.Prisma.ImageScalarFieldEnum = {
+exports.Prisma.Image1ScalarFieldEnum = {
   id: 'id',
   src: 'src',
   postId: 'postId'
 };
 
-exports.Prisma.PostTagScalarFieldEnum = {
-  postId: 'postId',
-  tagId: 'tagId'
+exports.Prisma.Image2ScalarFieldEnum = {
+  id: 'id',
+  src: 'src',
+  postId: 'postId'
+};
+
+exports.Prisma.Image3ScalarFieldEnum = {
+  id: 'id',
+  src: 'src',
+  postId: 'postId'
 };
 
 exports.Prisma.SortOrder = {
@@ -174,10 +186,12 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
-  Post: 'Post',
   Tag: 'Tag',
-  Image: 'Image',
-  PostTag: 'PostTag'
+  PostTag: 'PostTag',
+  Post: 'Post',
+  Image1: 'Image1',
+  Image2: 'Image2',
+  Image3: 'Image3'
 };
 
 /**

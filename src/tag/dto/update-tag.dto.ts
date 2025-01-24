@@ -14,10 +14,10 @@ export class UpdateTagReqDto {
 export class UpdateTagResDto {
   @ApiProperty({
     description: "The ID of the updated tag",
-    example: 1,
+    example: "fd3d1e80-6e11-4777-91b5-735dd2f45f8b",
   })
   @IsInt()
-  id: number; // 수정된 태그의 ID
+  id: string; // 수정된 태그의 ID
 
   @ApiProperty({
     description: "The name of the updated tag",

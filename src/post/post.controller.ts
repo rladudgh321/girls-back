@@ -32,7 +32,7 @@ import {
   ApiPostResponse,
 } from "src/common/decorator/swagger.decorator";
 import { Public } from "src/common/decorator/public.decorator";
-import { FilesInterceptor } from "@nestjs/platform-express";
+import { FileFieldsInterceptor } from "@nestjs/platform-express";
 
 @ApiTags("post")
 @ApiExtraModels(
@@ -49,12 +49,32 @@ export class PostController {
   @Public()
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FilesInterceptor("files"))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: "image1" },
+      { name: "image2" },
+      { name: "image3" },
+    ]),
+  )
   @ApiBody({
     schema: {
       type: "object",
       properties: {
-        files: {
+        image1: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "binary",
+          },
+        },
+        image2: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "binary",
+          },
+        },
+        image3: {
           type: "array",
           items: {
             type: "string",
@@ -68,19 +88,24 @@ export class PostController {
   async uploadFiles(
     @UploadedFiles(
       new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png|webp|gif)$/,
-        })
-        .addMaxSizeValidator({
-          maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
-        })
+        // .addFileTypeValidator({
+        //   fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
+        // })
+        // .addMaxSizeValidator({
+        //   maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
+        // })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         }),
     )
-    files: Express.Multer.File[], // 여러 파일을 처리하기 위해 배열로 수정
+    files: {
+      image1?: Express.Multer.File[];
+      image2?: Express.Multer.File[];
+      image3?: Express.Multer.File[];
+    },
   ) {
-    return this.postService.uploadImages(files); // 여러 파일을 처리하는 로직으로 수정
+    // 이미지 처리 로직
+    return this.postService.uploadImages(files);
   }
 
   @Public()
@@ -99,14 +124,25 @@ export class PostController {
   @Post()
   async createPost(
     @Body()
-    { title, content1, content2, content3, tags, images }: CreatePostReqDto,
+    {
+      title,
+      content1,
+      content2,
+      content3,
+      tags,
+      images1,
+      images2,
+      images3,
+    }: CreatePostReqDto,
     @Headers("authorization") token: string,
   ): Promise<any> {
     // ): Promise<CreatePostResponseDto> {
     const newPost = await this.postService.createPost(
       title,
       tags,
-      images,
+      images1,
+      images2,
+      images3,
       token,
       content3,
       content1,
@@ -160,7 +196,9 @@ export class PostController {
       content2: postData.content2,
       content3: postData.content3,
       tags: postData.tags,
-      images: postData.images,
+      images1: postData.images1,
+      images2: postData.images2,
+      images3: postData.images3,
     };
   }
 
@@ -168,9 +206,18 @@ export class PostController {
   @ApiPostResponse(UpdatePostResDto)
   @Patch(":id")
   async updatePost(
-    @Param("id") id: number, // :id로부터 파라미터 받기
+    @Param("id") id: string, // :id로부터 파라미터 받기
     @Body()
-    { title, content1, content2, content3, tags, images }: UpdatePostReqDto, // 수정할 데이터 받기
+    {
+      title,
+      content1,
+      content2,
+      content3,
+      tags,
+      images1,
+      images2,
+      images3,
+    }: UpdatePostReqDto, // 수정할 데이터 받기
   ): Promise<UpdatePostResDto> {
     const updatedPost = await this.postService.updatePost(
       id,
@@ -179,7 +226,9 @@ export class PostController {
       content2,
       content3,
       tags,
-      images,
+      images1,
+      images2,
+      images3,
     );
     return {
       id: updatedPost.id,
@@ -188,7 +237,9 @@ export class PostController {
       content2: updatedPost.content2,
       content3: updatedPost.content3,
       tags: updatedPost.tags,
-      images: updatedPost.images,
+      images1: updatedPost.images1,
+      images2: updatedPost.images2,
+      images3: updatedPost.images3,
     };
   }
 
@@ -200,7 +251,7 @@ export class PostController {
     example: 1,
   })
   async deletePost(
-    @Param("id") id: number,
+    @Param("id") id: string,
     @Headers("authorization") token: string,
   ) {
     const result = await this.postService.deletePost(id, token);

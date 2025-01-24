@@ -29,35 +29,51 @@ model RefreshToken {
   refreshTokenId String @unique
 }
 
-model Post {
-  id        Int       @id @default(autoincrement())
-  title     String
-  content1  String? // 내용 추가
-  content2  String? // 내용 추가
-  content3  String // 내용 추가
-  createdAt DateTime  @default(now())
-  postTags  PostTag[]
-  images    Image[]
-}
-
 model Tag {
-  id       Int       @id @default(autoincrement())
+  id       String    @id @default(uuid())
   name     String    @unique()
   postTags PostTag[]
 }
 
-model Image {
-  id     Int    @id @default(autoincrement())
+model PostTag {
+  postId String
+  tagId  String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Post {
+  id        String    @id @default(uuid()) // id는 String으로 유지
+  title     String
+  content1  String?
+  content2  String?
+  content3  String
+  createdAt DateTime  @default(now())
+  postTags  PostTag[]
+  images1   Image1[]
+  images2   Image2[]
+  images3   Image3[]
+}
+
+model Image1 {
+  id     String @id @default(uuid())
   src    String
-  postId Int
+  postId String // postId는 String으로 변경
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-model PostTag {
-  postId Int
-  tagId  Int
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+model Image2 {
+  id     String @id @default(uuid())
+  src    String
+  postId String // postId는 String으로 변경
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
 
-  @@id([postId, tagId])
+model Image3 {
+  id     String @id @default(uuid())
+  src    String
+  postId String // postId는 String으로 변경
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }

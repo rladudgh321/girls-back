@@ -51,7 +51,7 @@ export class TagService {
   }
 
   // 태그 수정
-  async updateTag(id: number, name: string, token: string) {
+  async updateTag(id: string, name: string, token: string) {
     // Prisma를 사용하여 태그 수정
     this.tokenCheck(token);
     const updatedTag = await this.prisma.tag.update({
@@ -68,7 +68,7 @@ export class TagService {
   }
 
   // 태그 삭제
-  async deleteTag({ id, token }: { id: number; token: string }) {
+  async deleteTag({ id, token }: { id: string; token: string }) {
     this.tokenCheck(token);
     // Prisma를 사용하여 태그 삭제
     const tag = await this.prisma.tag.findUnique({
