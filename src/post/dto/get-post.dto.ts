@@ -32,7 +32,21 @@ export class GetPostResDto {
     example: "hello everyone", // ISO 8601 형식 예시
   })
   @IsString()
-  content: string; // 게시글 작성일
+  content1?: string; // 게시글 작성일
+
+  @ApiProperty({
+    description: "The content the post was created",
+    example: "hello everyone", // ISO 8601 형식 예시
+  })
+  @IsString()
+  content2?: string; // 게시글 작성일
+
+  @ApiProperty({
+    description: "The content the post was created",
+    example: "hello everyone", // ISO 8601 형식 예시
+  })
+  @IsString()
+  content3: string; // 게시글 작성일
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",

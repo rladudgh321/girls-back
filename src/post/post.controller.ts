@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Delete,
-  UploadedFile,
   ParseFilePipeBuilder,
   HttpStatus,
   UseInterceptors,
@@ -33,7 +32,7 @@ import {
   ApiPostResponse,
 } from "src/common/decorator/swagger.decorator";
 import { Public } from "src/common/decorator/public.decorator";
-import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @ApiTags("post")
 @ApiExtraModels(
@@ -50,7 +49,7 @@ export class PostController {
   @Public()
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FilesInterceptor("files")) // FileInterceptor -> FilesInterceptor로 변경
+  @UseInterceptors(FilesInterceptor("files"))
   @ApiBody({
     schema: {
       type: "object",
@@ -70,10 +69,10 @@ export class PostController {
     @UploadedFiles(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png|webp)$/,
+          fileType: /(jpg|jpeg|png|webp|gif)$/,
         })
         .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024, // 최대 파일 크기 5MB
+          maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -99,21 +98,26 @@ export class PostController {
   @ApiPostResponse(CreatePostResponseDto)
   @Post()
   async createPost(
-    @Body() { title, content, tags, images }: CreatePostReqDto,
+    @Body()
+    { title, content1, content2, content3, tags, images }: CreatePostReqDto,
     @Headers("authorization") token: string,
   ): Promise<any> {
     // ): Promise<CreatePostResponseDto> {
     const newPost = await this.postService.createPost(
       title,
-      content,
       tags,
       images,
       token,
+      content3,
+      content1,
+      content2,
     );
     return {
       id: newPost.id,
       title: newPost.title,
-      content: newPost.content,
+      content1: newPost.content1,
+      content2: newPost.content2,
+      content3: newPost.content3,
       // tags: newPost.postTags[""],
       // images: newPost.images["images"],
     };
@@ -134,7 +138,9 @@ export class PostController {
       posts: result.posts.map((post) => ({
         id: post.id,
         title: post.title,
-        content: post.content,
+        content1: post.content1,
+        content2: post.content2,
+        content3: post.content3,
         tags: post.tags,
       })),
     };
@@ -150,7 +156,9 @@ export class PostController {
     return {
       id: postData.id,
       title: postData.title,
-      content: postData.content,
+      content1: postData.content1,
+      content2: postData.content2,
+      content3: postData.content3,
       tags: postData.tags,
       images: postData.images,
     };
@@ -161,19 +169,24 @@ export class PostController {
   @Patch(":id")
   async updatePost(
     @Param("id") id: number, // :id로부터 파라미터 받기
-    @Body() { title, content, tags, images }: UpdatePostReqDto, // 수정할 데이터 받기
+    @Body()
+    { title, content1, content2, content3, tags, images }: UpdatePostReqDto, // 수정할 데이터 받기
   ): Promise<UpdatePostResDto> {
     const updatedPost = await this.postService.updatePost(
       id,
       title,
-      content,
+      content1,
+      content2,
+      content3,
       tags,
       images,
     );
     return {
       id: updatedPost.id,
       title: updatedPost.title,
-      content: updatedPost.content,
+      content1: updatedPost.content1,
+      content2: updatedPost.content2,
+      content3: updatedPost.content3,
       tags: updatedPost.tags,
       images: updatedPost.images,
     };

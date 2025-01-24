@@ -47,10 +47,12 @@ export class PostService {
 
   async createPost(
     title: string,
-    content: string,
     tags: string[],
     images: { src: string }[],
     token: string,
+    content3: string,
+    content1?: string,
+    content2?: string,
   ) {
     // Token 확인 함수 (예시)
     this.tokenCheck(token);
@@ -79,7 +81,9 @@ export class PostService {
     const newPost = await this.prisma.post.create({
       data: {
         title,
-        content,
+        content1,
+        content2,
+        content3,
         images: imageData.length > 0 ? { create: imageData } : { create: [] }, // 이미지가 있을 경우에만 생성
         postTags:
           tagData.length > 0
@@ -135,7 +139,9 @@ export class PostService {
   async updatePost(
     id: number,
     title: string,
-    content: string,
+    content1: string,
+    content2: string,
+    content3: string,
     tags: number[],
     images: string[],
   ) {
@@ -153,7 +159,9 @@ export class PostService {
       where: { id },
       data: {
         title: title ?? existingPost.title, // 제목이 없으면 기존 제목 사용
-        content: content ?? existingPost.content, // 내용이 없으면 기존 내용 사용
+        content1: content1 ?? existingPost.content1, // 내용이 없으면 기존 내용 사용
+        content2: content2 ?? existingPost.content2, // 내용이 없으면 기존 내용 사용
+        content3: content3 ?? existingPost.content3, // 내용이 없으면 기존 내용 사용
         images: images
           ? {
               deleteMany: {}, // 기존 이미지 삭제
@@ -195,7 +203,9 @@ export class PostService {
     return {
       id: updatedPost.id,
       title: updatedPost.title,
-      content: updatedPost.content,
+      content1: updatedPost.content1,
+      content2: updatedPost.content2,
+      content3: updatedPost.content3,
       tags: updatedPost.postTags.map((postTag) => postTag.tag.id), // postTags에서 tag.id를 가져옴
       images: updatedPost.images.map((image) => image.src), // images에서 src를 가져옴
     };
@@ -222,12 +232,14 @@ export class PostService {
       throw new NotFoundException("Post not found");
     }
 
-    const { id, title, content, postTags, images } = post;
+    const { id, title, content1, content2, content3, postTags, images } = post;
 
     const responseData = {
       id,
       title,
-      content,
+      content1,
+      content2,
+      content3,
       tags: postTags ? postTags.map((tag) => tag.tag) : [],
       images: images ? images.map((image) => image.src) : [],
     };
@@ -288,7 +300,9 @@ export class PostService {
       select: {
         id: true,
         title: true,
-        content: true,
+        content1: true,
+        content2: true,
+        content3: true,
         postTags: {
           select: {
             tag: true,
@@ -309,7 +323,9 @@ export class PostService {
     const formattedPosts = posts.map((post) => ({
       id: post.id,
       title: post.title,
-      content: post.content,
+      content1: post.content1,
+      content2: post.content2,
+      content3: post.content3,
       tags: post.postTags.map((postTag) => ({
         id: postTag.tag.id,
         name: postTag.tag.name,

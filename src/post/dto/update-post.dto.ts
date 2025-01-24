@@ -23,7 +23,23 @@ export class UpdatePostReqDto {
   })
   @IsString()
   @IsOptional() // 내용은 선택적으로 수정 가능
-  content?: string;
+  content1?: string;
+
+  @ApiProperty({
+    description: "The new content of the post",
+    example: "This is the updated content of the post.",
+  })
+  @IsString()
+  @IsOptional() // 내용은 선택적으로 수정 가능
+  content2?: string;
+
+  @ApiProperty({
+    description: "The new content of the post",
+    example: "This is the updated content of the post.",
+  })
+  @IsString()
+  @IsOptional() // 내용은 선택적으로 수정 가능
+  content3: string;
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",
@@ -62,7 +78,19 @@ export class UpdatePostResDto {
     description: "The updated content of the post",
     example: "This is the updated content of the post.",
   })
-  content: string;
+  content1?: string;
+
+  @ApiProperty({
+    description: "The updated content of the post",
+    example: "This is the updated content of the post.",
+  })
+  content2?: string;
+
+  @ApiProperty({
+    description: "The updated content of the post",
+    example: "This is the updated content of the post.",
+  })
+  content3: string;
 
   @ApiPropertyOptional({
     description: "List of updated tag IDs associated with the post",

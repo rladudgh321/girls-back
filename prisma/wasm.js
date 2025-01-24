@@ -133,7 +133,9 @@ exports.Prisma.RefreshTokenScalarFieldEnum = {
 exports.Prisma.PostScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  content: 'content',
+  content1: 'content1',
+  content2: 'content2',
+  content3: 'content3',
   createdAt: 'createdAt'
 };
 

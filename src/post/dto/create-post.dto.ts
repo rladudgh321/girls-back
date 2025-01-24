@@ -23,7 +23,23 @@ export class CreatePostReqDto {
   })
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content1?: string;
+
+  @ApiProperty({
+    description: "The content of the post",
+    example: "In this post, we will learn how to use NestJS with Prisma...",
+  })
+  @IsString()
+  @IsNotEmpty()
+  content2?: string;
+
+  @ApiProperty({
+    description: "The content of the post",
+    example: "In this post, we will learn how to use NestJS with Prisma...",
+  })
+  @IsString()
+  @IsNotEmpty()
+  content3: string;
 
   @ApiPropertyOptional({
     description: "List of tag IDs associated with the post",

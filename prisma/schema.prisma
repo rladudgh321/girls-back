@@ -32,7 +32,9 @@ model RefreshToken {
 model Post {
   id        Int       @id @default(autoincrement())
   title     String
-  content   String? // 내용 추가
+  content1  String? // 내용 추가
+  content2  String? // 내용 추가
+  content3  String // 내용 추가
   createdAt DateTime  @default(now())
   postTags  PostTag[]
   images    Image[]
