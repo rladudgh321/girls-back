@@ -105,8 +105,8 @@ export class PostService {
     const newPost = await this.prisma.post.create({
       data: {
         title,
-        content1,
-        content2,
+        content1: content1.length > 0 ? content1 : null,
+        content2: content2.length > 0 ? content2 : null,
         content3,
         images1:
           images1.length > 0

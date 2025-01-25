@@ -135,8 +135,7 @@ export class PostController {
       images3,
     }: CreatePostReqDto,
     @Headers("authorization") token: string,
-  ): Promise<any> {
-    // ): Promise<CreatePostResponseDto> {
+  ): Promise<CreatePostResponseDto> {
     const newPost = await this.postService.createPost(
       title,
       tags,
@@ -154,8 +153,10 @@ export class PostController {
       content1: newPost.content1,
       content2: newPost.content2,
       content3: newPost.content3,
-      // tags: newPost.postTags[""],
-      // images: newPost.images["images"],
+      tags: newPost.postTags,
+      images1: newPost.images1,
+      images2: newPost.images2,
+      images3: newPost.images3,
     };
   }
 

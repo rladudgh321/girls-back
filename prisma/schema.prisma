@@ -49,7 +49,7 @@ model Post {
   title     String
   content1  String?
   content2  String?
-  content3  String
+  content3  String?
   createdAt DateTime  @default(now())
   postTags  PostTag[]
   images1   Image1[]
