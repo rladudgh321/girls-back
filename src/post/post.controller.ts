@@ -88,12 +88,12 @@ export class PostController {
   async uploadFiles(
     @UploadedFiles(
       new ParseFilePipeBuilder()
-        // .addFileTypeValidator({
-        //   fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
-        // })
-        // .addMaxSizeValidator({
-        //   maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
-        // })
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
+        })
+        .addMaxSizeValidator({
+          maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
+        })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         }),
@@ -104,8 +104,13 @@ export class PostController {
       image3?: Express.Multer.File[];
     },
   ) {
+    const validFiles = {
+      image1: files.image1 || [],
+      image2: files.image2 || [],
+      image3: files.image3 || [],
+    };
     // 이미지 처리 로직
-    return this.postService.uploadImages(files);
+    return this.postService.uploadImages(validFiles);
   }
 
   @Public()
