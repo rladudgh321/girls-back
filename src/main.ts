@@ -12,11 +12,11 @@ import * as fs from "fs";
 import * as path from "path";
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync(path.join(process.cwd(), "private.key")), // 개인 키
-    cert: fs.readFileSync(path.join(process.cwd(), "certificate.crt")), // 서버 인증서
-    ca: fs.readFileSync(path.join(process.cwd(), "ca_bundle.crt")), // 인증서 체인
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync(path.join(process.cwd(), "private.key")), // 개인 키
+  //   cert: fs.readFileSync(path.join(process.cwd(), "certificate.crt")), // 서버 인증서
+  //   ca: fs.readFileSync(path.join(process.cwd(), "ca_bundle.crt")), // 인증서 체인
+  // };
   const app = await NestFactory.create(AppModule, { httpsOptions: null });
 
   app.enableCors({
@@ -25,7 +25,14 @@ async function bootstrap() {
     credentials: true,
   });
 
+  console.log("process.env.SWAGGER_USER", process.env.SWAGGER_USER);
+  console.log("process.env.SWAGGER_PASSWORD", process.env.SWAGGER_PASSWORD);
+
+  
   const configService = app.get(ConfigService);
+
+  console.log(configService.get("swagger.user"));
+  console.log(configService.get("swagger.password"));
   const stage = configService.get("STAGE");
   const SWAGGER_ENVS = ["development", "test"];
   if (SWAGGER_ENVS.includes(stage)) {

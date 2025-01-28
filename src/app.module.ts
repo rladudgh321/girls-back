@@ -13,6 +13,7 @@ import { JwtService } from "@nestjs/jwt";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { join } from "path";
+import swaggerConfig from "./config/swagger.config";
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { join } from "path";
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [jwtConfig],
+      load: [jwtConfig, swaggerConfig],
     }),
     UserModule,
     AuthModule,

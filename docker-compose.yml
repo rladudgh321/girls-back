@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  nestjs:
+    build:
+      context: .  # Dockerfile이 있는 디렉토리
+      dockerfile: Dockerfile  # 사용할 Dockerfile 명시
+    container_name: nestjs-app
+    ports:
+      - "3065:3065"  # 호스트의 3065 포트를 컨테이너의 3065 포트에 연결
+    env_file:
+      - .env  # .env 파일을 로드하여 환경 변수를 전달
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - DATABASE_URL=${DATABASE_URL}  # .env 파일에서 DATABASE_URL을 가져옴
+    networks:
+      - app-network
+    depends_on:
+      - postgres-db  # PostgreSQL이 먼저 시작되도록 설정
+    command: ["sh", "-c", "/app/wait-for-it.sh postgres-db:5432 --timeout=300 -- yarn prisma migrate deploy && yarn start:prod"]  # 절대 경로로 wait-for-it 실행
+
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}  # .env 파일에서 POSTGRES_USER을 가져옴
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}  # .env 파일에서 POSTGRES_PASSWORD을 가져옴
+      - POSTGRES_DB=${POSTGRES_DB}  # .env 파일에서 POSTGRES_DB을 가져옴
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # 데이터 영속화용 볼륨
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:  # PostgreSQL 데이터 영속화 볼륨 정의
+
+networks:
+  app-network:
+    driver: bridge  # 기본 브리지 네트워크 사용
