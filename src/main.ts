@@ -12,12 +12,6 @@ import * as fs from "fs";
 import * as path from "path";
 
 async function bootstrap() {
-  // const httpsOptions = {
-  //   key: fs.readFileSync(path.join(process.cwd(), "private.key")), // 개인 키
-  //   cert: fs.readFileSync(path.join(process.cwd(), "certificate.crt")), // 서버 인증서
-  //   ca: fs.readFileSync(path.join(process.cwd(), "ca_bundle.crt")), // 인증서 체인
-  // };
-  // const app = await NestFactory.create(AppModule, { httpsOptions: null });
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
@@ -29,7 +23,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const stage = configService.get("STAGE");
-  const SWAGGER_ENVS = ["development", "test"];
+  const SWAGGER_ENVS = ["development", "test", "production"];
   if (SWAGGER_ENVS.includes(stage)) {
     app.use(
       ["/api", "/api-json"],
@@ -64,9 +58,8 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.NODE_ENV === "production" ? 80 : 3065;
+  const port = process.env.NODE_ENV === "production" ? 3065 : 3065;
   console.info(`서버모드는 ${stage}이고 port는 ${port}`);
-
   await app.listen(port, "0.0.0.0");
 }
 bootstrap();
