@@ -17,7 +17,8 @@ async function bootstrap() {
   //   cert: fs.readFileSync(path.join(process.cwd(), "certificate.crt")), // 서버 인증서
   //   ca: fs.readFileSync(path.join(process.cwd(), "ca_bundle.crt")), // 인증서 체인
   // };
-  const app = await NestFactory.create(AppModule, { httpsOptions: null });
+  // const app = await NestFactory.create(AppModule, { httpsOptions: null });
+  const app = await NestFactory.create(AppModule);
 
   app.enableCors({
     origin: true,
@@ -25,14 +26,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  console.log("process.env.SWAGGER_USER", process.env.SWAGGER_USER);
-  console.log("process.env.SWAGGER_PASSWORD", process.env.SWAGGER_PASSWORD);
-
-  
   const configService = app.get(ConfigService);
 
-  console.log(configService.get("swagger.user"));
-  console.log(configService.get("swagger.password"));
   const stage = configService.get("STAGE");
   const SWAGGER_ENVS = ["development", "test"];
   if (SWAGGER_ENVS.includes(stage)) {
@@ -69,7 +64,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.NODE_ENV === "production" ? 443 : 3065;
+  const port = process.env.NODE_ENV === "production" ? 80 : 3065;
   console.info(`서버모드는 ${stage}이고 port는 ${port}`);
 
   await app.listen(port, "0.0.0.0");
