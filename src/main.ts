@@ -8,8 +8,6 @@ import {
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as basicAuth from "express-basic-auth";
-import * as fs from "fs";
-import * as path from "path";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +15,7 @@ async function bootstrap() {
   app.enableCors({
     origin: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Authorization",
     credentials: true,
   });
 
