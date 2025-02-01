@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { MulterOptionsFactory } from "@nestjs/platform-express";
 import * as fs from "fs";
 import * as multer from "multer";
@@ -7,7 +7,7 @@ import * as path from "path";
 @Injectable()
 export class MulterConfigService implements MulterOptionsFactory {
   dirPath: string;
-  constructor() {
+  constructor(private readonly logger: Logger) {
     this.dirPath = path.join(process.cwd(), "uploads");
     this.mkdir();
   }
@@ -17,7 +17,7 @@ export class MulterConfigService implements MulterOptionsFactory {
     try {
       fs.readdirSync(this.dirPath);
     } catch (err) {
-      console.error(err);
+      this.logger.warn(err);
       fs.mkdirSync(this.dirPath);
     }
   }

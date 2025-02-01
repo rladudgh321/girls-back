@@ -339,8 +339,6 @@ export class PostService {
       images3: images3 ? images3.map((image) => image.src) : [],
     };
 
-    console.log("ddd", responseData);
-
     return responseData;
   }
 

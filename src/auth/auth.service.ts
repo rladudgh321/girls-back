@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -12,6 +13,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly logger: Logger,
   ) {}
 
   async signup(email: string, password: string) {
@@ -51,7 +53,7 @@ export class AuthService {
         refreshToken,
       };
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
     }
   }
 
