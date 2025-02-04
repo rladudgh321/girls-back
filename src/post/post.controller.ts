@@ -88,12 +88,12 @@ export class PostController {
   async uploadFiles(
     @UploadedFiles(
       new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
-        })
-        .addMaxSizeValidator({
-          maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
-        })
+        // .addFileTypeValidator({
+        //   fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
+        // })
+        // .addMaxSizeValidator({
+        //   maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
+        // })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         }),
