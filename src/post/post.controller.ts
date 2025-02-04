@@ -51,30 +51,30 @@ export class PostController {
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: "image1" },
-      { name: "image2" },
-      { name: "image3" },
+      { name: "images1" },
+      { name: "images2" },
+      { name: "images3" },
     ]),
   )
   @ApiBody({
     schema: {
       type: "object",
       properties: {
-        image1: {
+        images1: {
           type: "array",
           items: {
             type: "string",
             format: "binary",
           },
         },
-        image2: {
+        images2: {
           type: "array",
           items: {
             type: "string",
             format: "binary",
           },
         },
-        image3: {
+        images3: {
           type: "array",
           items: {
             type: "string",
@@ -89,7 +89,7 @@ export class PostController {
     @UploadedFiles(
       new ParseFilePipeBuilder()
         // .addFileTypeValidator({
-        //   fileType: /(jpg|jpeg|png|webp|gif)$/, // 허용되는 이미지 파일 확장자
+        //   fileType: /(jpg|jpeg|png|webp|gif)$/i, // 허용되는 이미지 파일 확장자
         // })
         // .addMaxSizeValidator({
         //   maxSize: 10 * 1024 * 1024, // 최대 파일 크기 10MB
@@ -99,15 +99,15 @@ export class PostController {
         }),
     )
     files: {
-      image1?: Express.Multer.File[];
-      image2?: Express.Multer.File[];
-      image3?: Express.Multer.File[];
+      images1?: Express.Multer.File[];
+      images2?: Express.Multer.File[];
+      images3?: Express.Multer.File[];
     },
   ) {
     const validFiles = {
-      image1: files.image1 || [],
-      image2: files.image2 || [],
-      image3: files.image3 || [],
+      images1: files.images1 || [],
+      images2: files.images2 || [],
+      images3: files.images3 || [],
     };
     // 이미지 처리 로직
     return this.postService.uploadImages(validFiles);
