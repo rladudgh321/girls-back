@@ -26,7 +26,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const stage = configService.get("STAGE");
-  const SWAGGER_ENVS = ["development", "test", "production"];
+  const SWAGGER_ENVS = ["development", "test"];
   if (SWAGGER_ENVS.includes(stage)) {
     app.use(
       ["/api", "/api-json"],
