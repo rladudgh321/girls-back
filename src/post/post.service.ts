@@ -30,32 +30,32 @@ export class PostService {
   }
 
   async uploadImages(files: {
-    image1?: Express.Multer.File[];
-    image2?: Express.Multer.File[];
-    image3?: Express.Multer.File[];
+    images1?: Express.Multer.File[];
+    images2?: Express.Multer.File[];
+    images3?: Express.Multer.File[];
   }) {
     // 각 필드에 대해 파일이 있는지 확인하고 처리
     const imageUrls: string[] = [];
 
     // image1 필드에 있는 파일들을 처리
-    if (files.image1 && files.image1.length > 0) {
-      files.image1.forEach((file) => {
+    if (files.images1 && files.images1.length > 0) {
+      files.images1.forEach((file) => {
         const fileName = path.basename(file.path); // 경로에서 파일 이름 추출
         imageUrls.push(fileName);
       });
     }
 
     // image2 필드에 있는 파일들을 처리
-    if (files.image2 && files.image2.length > 0) {
-      files.image2.forEach((file) => {
+    if (files.images2 && files.images2.length > 0) {
+      files.images2.forEach((file) => {
         const fileName = path.basename(file.path);
         imageUrls.push(fileName);
       });
     }
 
     // image3 필드에 있는 파일들을 처리
-    if (files.image3 && files.image3.length > 0) {
-      files.image3.forEach((file) => {
+    if (files.images3 && files.images3.length > 0) {
+      files.images3.forEach((file) => {
         const fileName = path.basename(file.path);
         imageUrls.push(fileName);
       });

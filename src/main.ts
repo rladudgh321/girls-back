@@ -13,7 +13,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: true,
+    origin: [
+      "http://127.0.0.1:3000",
+      "https://www.sarangirls.kro.kr",
+      "https://saranggirls.kro.kr",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
     credentials: true,
@@ -22,7 +26,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const stage = configService.get("STAGE");
-  const SWAGGER_ENVS = ["development", "test", "production"];
+  const SWAGGER_ENVS = ["development", "test"];
   if (SWAGGER_ENVS.includes(stage)) {
     app.use(
       ["/api", "/api-json"],
@@ -57,7 +61,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.NODE_ENV === "production" ? 3065 : 3065;
+  const port = 3065;
   console.info(`서버모드는 ${stage}이고 port는 ${port}`);
   await app.listen(port, "0.0.0.0");
 }
