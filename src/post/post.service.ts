@@ -345,7 +345,7 @@ export class PostService {
   async getAllPostIds() {
     // Prisma를 사용하여 'posts' 테이블에서 'id'만 선택
     const posts = await this.prisma.post.findMany({
-      select: { id: true }, // id만 선택
+      select: { id: true, createdAt: true }, // id만 선택
     });
 
     if (!posts || posts.length === 0) {
