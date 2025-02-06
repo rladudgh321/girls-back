@@ -15,8 +15,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://127.0.0.1:3000",
-      "https://www.sarangirls.kro.kr",
-      "https://saranggirls.kro.kr",
+      "https://www.sarangirls.com",
+      "https://saranggirls.com",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
