@@ -19,7 +19,7 @@ async function bootstrap() {
       "https://saranggirls.com",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type, Authorization",
+    allowedHeaders: "X-Requested-With, Content-Type, Accept, Authorization",
     credentials: true,
   });
 
