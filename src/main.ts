@@ -15,7 +15,11 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://127.0.0.1:3000",
+<<<<<<< HEAD
       "https://www.saranggirls.com",
+=======
+      "https://www.sarangirls.com",
+>>>>>>> aa1e4b67eead2996dbcd540fcc9c343be0904bba
       "https://saranggirls.com",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
